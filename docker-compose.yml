@@ -1,0 +1,40 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. MongoDB Database Service
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db # Keeps your data safe if the container stops
+    networks:
+      - mern_network
+
+  # 2. Node.js Backend Service
+  backend:
+    build: ./server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb # Ensures database starts before the backend
+    networks:
+      - mern_network
+
+  # 3. React Frontend Service
+  frontend:
+    build: ./client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - mern_network
+
+volumes:
+  mongo-data:
+
+networks:
+  mern_network:
+    driver: bridge
